@@ -52,7 +52,7 @@ then
 	exit 1
 fi
 
-if ! mkdir /opt/glibc2.28
+if ! mkdir -p /opt/glibc2.28
 then
 	echo "Failed to create glibc2.28 directory. Exiting."
 	rm /tmp/glibc2.28.tar.gz
