@@ -5,7 +5,7 @@ fi
 
 if ! which subl
 then
-	read -p "Sublime Text not installed. Install Sublime Text and continue? [yY/nN]" -n 1 -r
+	read -p "Sublime Text not installed. Install Sublime Text and continue? [yY/nN]: " -n 1 -r
 	echo
 	if [[ $REPLY =~ ^[Yy]$ ]]
 	then
