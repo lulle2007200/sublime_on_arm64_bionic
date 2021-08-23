@@ -3,36 +3,50 @@ if [ "$EUID" -ne 0 ]
   exit
 fi
 
-read -p "Make sure, Sublime Text is installed.\nPress enter to continue"
-
-if ! which patchelf
+if ! which subl
 then
-	if ! apt install patchelf
+	read -p "Sublime Text not installed. Install Sublime Text and continue?" -n 1 -r
+	echo
+	if [[ $REPLY =~ ^[Yy]$ ]]
 	then
-		echo "Failed to install patchelf. Exiting."
+		if ! apt install apt-transport-https software-properties-common
+		then
+			echo "Failed to install dependencies. Exiting."
+			exit 1
+		fi
+	    if ! wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add -
+	    then
+	    	echo "Failed to install Sublime GPG key. Exiting."
+	    	exit 1
+	    fi
+	    if ! add-apt-repository "deb https://download.sublimetext.com/ apt/stable/"
+	    then
+	    	echo "Failed to add Sublime Text apt repository. Exiting"
+	    	exit 1
+	    fi
+	    if ! apt update
+	    then
+	    	echo "apt update failed. Exiting."
+	    	exit 1
+	    fi
+	    if ! apt install sublime-text
+	    then
+	    	echo "Failed to install Sublime Text. Exiting."
+	    	exit 1
+	    fi
+	else
+		echo "Exiting."
 		exit 1
 	fi
 fi
 
-if ! which wget
+if ! apt install patchelf wget tar
 then
-	if ! apt install wget
-	then
-		echo "Failed to install wget. Exiting."
-		exit 1
-	fi
+	echo "Failed to install dependencies. Exiting."
+	exit 1
 fi
 
-if ! which tar
-then
-	if ! apt install tar
-	then
-		echo "Failed to install tar. Exiting."
-		exit 1
-	fi
-fi
-
-if ! wget -O /tmp/glibc2.28.tar.gz https://github.com/lulle2007200/sublime_on_arm64_bionic/raw/master/glibc2.28.tar.gz
+if ! wget -qO /tmp/glibc2.28.tar.gz https://github.com/lulle2007200/sublime_on_arm64_bionic/raw/master/glibc2.28.tar.gz
 then
 	echo "Failed to download glibc2.27.tar.gz. Exiting."
 	exit 1
