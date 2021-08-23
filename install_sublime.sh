@@ -9,7 +9,7 @@ then
 	echo
 	if [[ $REPLY =~ ^[Yy]$ ]]
 	then
-		if ! apt -y install apt-transport-https software-properties-common
+		if ! apt -qq -y install wget apt-transport-https software-properties-common
 		then
 			echo "Failed to install dependencies. Exiting."
 			exit 1
@@ -24,12 +24,12 @@ then
 	    	echo "Failed to add Sublime Text apt repository. Exiting"
 	    	exit 1
 	    fi
-	    if ! apt update
+	    if ! apt -qq update
 	    then
 	    	echo "apt update failed. Exiting."
 	    	exit 1
 	    fi
-	    if ! apt -y install sublime-text
+	    if ! apt -qq -y install sublime-text
 	    then
 	    	echo "Failed to install Sublime Text. Exiting."
 	    	exit 1
@@ -40,7 +40,7 @@ then
 	fi
 fi
 
-if ! apt -y install patchelf wget tar
+if ! apt -qq -y install patchelf wget tar
 then
 	echo "Failed to install dependencies. Exiting."
 	exit 1
@@ -59,7 +59,7 @@ then
 	exit 1
 fi
 
-if ! tar -zxvf /tmp/glibc2.28.tar.gz -C /opt/glibc2.28
+if ! tar -zxf /tmp/glibc2.28.tar.gz -C /opt/glibc2.28
 then
 	echo "Failed to extract glibc2.28. Exiting."
 	rm /tmp/glibc2.28.tar.gz
