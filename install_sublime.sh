@@ -5,11 +5,11 @@ fi
 
 if ! which subl
 then
-	read -p "Sublime Text not installed. Install Sublime Text and continue?" -n 1 -r
+	read -p "Sublime Text not installed. Install Sublime Text and continue? [yY/nN]" -n 1 -r
 	echo
 	if [[ $REPLY =~ ^[Yy]$ ]]
 	then
-		if ! apt install apt-transport-https software-properties-common
+		if ! apt -y install apt-transport-https software-properties-common
 		then
 			echo "Failed to install dependencies. Exiting."
 			exit 1
@@ -29,7 +29,7 @@ then
 	    	echo "apt update failed. Exiting."
 	    	exit 1
 	    fi
-	    if ! apt install sublime-text
+	    if ! apt -y install sublime-text
 	    then
 	    	echo "Failed to install Sublime Text. Exiting."
 	    	exit 1
@@ -40,7 +40,7 @@ then
 	fi
 fi
 
-if ! apt install patchelf wget tar
+if ! apt -y install patchelf wget tar
 then
 	echo "Failed to install dependencies. Exiting."
 	exit 1
