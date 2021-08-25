@@ -101,7 +101,7 @@ then
 	exit 1
 fi
 
-if ! \cp -r "${tempdir}/"{sublime_text,plugin_host-3.3,plugin_host-3.8,crash_reporter} /opt/sublime_text/
+if ! \cp -f "${tempdir}/"{sublime_text,plugin_host-3.3,plugin_host-3.8,crash_reporter} /opt/sublime_text/
 then
 	echo "Failed to replace Sublime Text binaries. Exiting."
 	# rm -rf "${tempdir}"
