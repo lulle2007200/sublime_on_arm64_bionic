@@ -51,6 +51,8 @@ then
 	echo "Failed to create temporary directory. Exiting."
 fi
 
+echo "dir: $tempdir"
+
 if ! wget -qO "${tempdir}/glibc2.28.tar.gz" https://github.com/lulle2007200/sublime_on_arm64_bionic/raw/master/glibc2.28.tar.gz
 then
 	echo "Failed to download glibc2.27.tar.gz. Exiting."
@@ -60,21 +62,21 @@ fi
 if ! mkdir -p /opt/glibc2.28
 then
 	echo "Failed to create glibc2.28 directory. Exiting."
-	rm -rf "${tempdir}"
+	# rm -rf "${tempdir}"
 	exit 1
 fi
 
 if ! tar -zxf "${tempdir}/glibc2.28.tar.gz" -C /opt/glibc2.28
 then
 	echo "Failed to extract glibc2.28. Exiting."
-	rm -rf "${tempdir}"
+	# rm -rf "${tempdir}"
 	exit 1
 fi
 
 if ! cp /opt/sublime_text/{sublime_text,plugin_host-3.3,plugin_host-3.8,crash_reporter} "${tempdir}/"
 then
 	echo "Failed to copy Sublime Text binaries to temporary directory. Exiting."
-	rm -rf "${tempdir}"
+	# rm -rf "${tempdir}"
 	exit 1
 fi
 
@@ -88,19 +90,19 @@ if ! patchelf --remove-rpath "${tempdir}/sublime_text" || \
    ! patchelf --force-rpath --set-rpath "/opt/glibc2.28/lib:/usr/lib/aarch64-linux-gnu:/lib/aarch64-linux-gnu:\$ORIGIN" --set-interpreter /opt/glibc2.28/lib/ld-linux-aarch64.so.1 "${tempdir}/sublime_text/crash_reporter"
 then
 	echo "Failed to patch Sublime Text binaries. Exiting."
-	rm -rf "${tempdir}"
+	# rm -rf "${tempdir}"
 	exit 1
 fi
 
-if ! \cp -r "${tempdir}/"{sublime_text,plugin_host-3.3,plugin_host-3.8,crash_reporter} /opt/sublime_text
+if ! \cp -r "${tempdir}/"{sublime_text,plugin_host-3.3,plugin_host-3.8,crash_reporter} /opt/sublime_text/
 then
 	echo "Failed to replace Sublime Text binaries. Exiting."
-	rm -rf "${tempdir}"
+	# rm -rf "${tempdir}"
 	exit 1
 fi
 
 
-rm -rf "${tempdir}"
+# rm -rf "${tempdir}"
 
 
 echo "Successfully installed Sublime Text."
