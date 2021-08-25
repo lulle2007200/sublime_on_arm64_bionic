@@ -1,6 +1,6 @@
 if [ "$EUID" -ne 0 ]
-  then echo "Run as sudo"
-  exit
+	then echo "Run as sudo"
+	exit
 fi
 
 if ! which subl
@@ -51,6 +51,15 @@ then
 	echo "Failed to create temporary directory. Exiting."
 fi
 
+if ! chmod 1777 "${tempdir}"
+then
+	echo "Failed to set temporary directory permissions. Exiting."
+	rm -rf "${tempdir}"
+	exit 1
+fi
+
+echo "dir: $tempdir"
+
 if ! wget -qO "${tempdir}/glibc2.28.tar.gz" https://github.com/lulle2007200/sublime_on_arm64_bionic/raw/master/glibc2.28.tar.gz
 then
 	echo "Failed to download glibc2.27.tar.gz. Exiting."
@@ -82,17 +91,17 @@ if ! patchelf --remove-rpath "${tempdir}/sublime_text" || \
    ! patchelf --remove-rpath "${tempdir}/plugin_host-3.3" || \
    ! patchelf --remove-rpath "${tempdir}/plugin_host-3.8" || \
    ! patchelf --remove-rpath "${tempdir}/crash_reporter" || \
-   ! patchelf --force-rpath --set-rpath "/opt/glibc2.28/lib:/usr/lib/aarch64-linux-gnu:/lib/aarch64-linux-gnu:\$ORIGIN" --set-interpreter /opt/glibc2.28/lib/ld-linux-aarch64.so.1 "${tempdir}/sublime_text/sublime_text" || \
-   ! patchelf --force-rpath --set-rpath "/opt/glibc2.28/lib:/usr/lib/aarch64-linux-gnu:/lib/aarch64-linux-gnu:\$ORIGIN" --set-interpreter /opt/glibc2.28/lib/ld-linux-aarch64.so.1 "${tempdir}/sublime_text/plugin_host-3.3" || \
-   ! patchelf --force-rpath --set-rpath "/opt/glibc2.28/lib:/usr/lib/aarch64-linux-gnu:/lib/aarch64-linux-gnu:\$ORIGIN" --set-interpreter /opt/glibc2.28/lib/ld-linux-aarch64.so.1 "${tempdir}/sublime_text/plugin_host-3.8" || \
-   ! patchelf --force-rpath --set-rpath "/opt/glibc2.28/lib:/usr/lib/aarch64-linux-gnu:/lib/aarch64-linux-gnu:\$ORIGIN" --set-interpreter /opt/glibc2.28/lib/ld-linux-aarch64.so.1 "${tempdir}/sublime_text/crash_reporter"
+   ! patchelf --force-rpath --set-rpath "/opt/glibc2.28/lib:/usr/lib/aarch64-linux-gnu:/lib/aarch64-linux-gnu:\$ORIGIN" --set-interpreter /opt/glibc2.28/lib/ld-linux-aarch64.so.1 "${tempdir}/sublime_text" || \
+   ! patchelf --force-rpath --set-rpath "/opt/glibc2.28/lib:/usr/lib/aarch64-linux-gnu:/lib/aarch64-linux-gnu:\$ORIGIN" --set-interpreter /opt/glibc2.28/lib/ld-linux-aarch64.so.1 "${tempdir}/plugin_host-3.3" || \
+   ! patchelf --force-rpath --set-rpath "/opt/glibc2.28/lib:/usr/lib/aarch64-linux-gnu:/lib/aarch64-linux-gnu:\$ORIGIN" --set-interpreter /opt/glibc2.28/lib/ld-linux-aarch64.so.1 "${tempdir}/plugin_host-3.8" || \
+   ! patchelf --force-rpath --set-rpath "/opt/glibc2.28/lib:/usr/lib/aarch64-linux-gnu:/lib/aarch64-linux-gnu:\$ORIGIN" --set-interpreter /opt/glibc2.28/lib/ld-linux-aarch64.so.1 "${tempdir}/crash_reporter"
 then
 	echo "Failed to patch Sublime Text binaries. Exiting."
 	rm -rf "${tempdir}"
 	exit 1
 fi
 
-if ! \cp -r "${tempdir}/"{sublime_text,plugin_host-3.3,plugin_host-3.8,crash_reporter} /opt/sublime_text
+if ! \cp -f "${tempdir}/"{sublime_text,plugin_host-3.3,plugin_host-3.8,crash_reporter} /opt/sublime_text/
 then
 	echo "Failed to replace Sublime Text binaries. Exiting."
 	rm -rf "${tempdir}"
