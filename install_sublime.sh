@@ -40,7 +40,7 @@ then
 	fi
 fi
 
-if ! apt -qq -y install patchelf wget tar mktemp
+if ! apt -qq -y install patchelf wget tar coreutils
 then
 	echo "Failed to install dependencies. Exiting."
 	exit 1
