@@ -51,6 +51,13 @@ then
 	echo "Failed to create temporary directory. Exiting."
 fi
 
+if ! chmod 1777 "${tempdir}"
+then
+	echo "Failed to set temporary directory permissions. Exiting."
+	# rm -rf "${tempdir}"
+	exit 1
+fi
+
 echo "dir: $tempdir"
 
 if ! wget -qO "${tempdir}/glibc2.28.tar.gz" https://github.com/lulle2007200/sublime_on_arm64_bionic/raw/master/glibc2.28.tar.gz
