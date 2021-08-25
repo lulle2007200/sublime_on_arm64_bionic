@@ -40,13 +40,18 @@ then
 	fi
 fi
 
-if ! apt -qq -y install patchelf wget tar
+if ! apt -qq -y install patchelf wget tar mktemp
 then
 	echo "Failed to install dependencies. Exiting."
 	exit 1
 fi
 
-if ! wget -qO /tmp/glibc2.28.tar.gz https://github.com/lulle2007200/sublime_on_arm64_bionic/raw/master/glibc2.28.tar.gz
+if ! tempdir=$(mktemp -d)
+then
+	echo "Failed to create temporary directory. Exiting."
+fi
+
+if ! wget -qO "${tempdir}/glibc2.28.tar.gz" https://github.com/lulle2007200/sublime_on_arm64_bionic/raw/master/glibc2.28.tar.gz
 then
 	echo "Failed to download glibc2.27.tar.gz. Exiting."
 	exit 1
@@ -55,31 +60,48 @@ fi
 if ! mkdir -p /opt/glibc2.28
 then
 	echo "Failed to create glibc2.28 directory. Exiting."
-	rm /tmp/glibc2.28.tar.gz
+	rm -rf "${tempdir}"
 	exit 1
 fi
 
-if ! tar -zxf /tmp/glibc2.28.tar.gz -C /opt/glibc2.28
+if ! tar -zxf "${tempdir}/glibc2.28.tar.gz" -C /opt/glibc2.28
 then
 	echo "Failed to extract glibc2.28. Exiting."
-	rm /tmp/glibc2.28.tar.gz
+	rm -rf "${tempdir}"
 	exit 1
 fi
 
-rm /tmp/glibc2.28.tar.gz
+if ! cp /opt/sublime_text/{sublime_text,plugin_host-3.3,plugin_host-3.8,crash_reporter} "${tempdir}/"
+then
+	echo "Failed to copy Sublime Text binaries to temporary directory. Exiting."
+	rm -rf "${tempdir}"
+	exit 1
+fi
 
-if ! patchelf --remove-rpath /opt/sublime_text/sublime_text || \
-   ! patchelf --remove-rpath /opt/sublime_text/plugin_host-3.3 || \
-   ! patchelf --remove-rpath /opt/sublime_text/plugin_host-3.8 || \
-   ! patchelf --remove-rpath /opt/sublime_text/crash_reporter || \
-   ! patchelf --force-rpath --set-rpath "/opt/glibc2.28/lib:/usr/lib/aarch64-linux-gnu:/lib/aarch64-linux-gnu:\$ORIGIN" --set-interpreter /opt/glibc2.28/lib/ld-linux-aarch64.so.1 /opt/sublime_text/sublime_text || \
-   ! patchelf --force-rpath --set-rpath "/opt/glibc2.28/lib:/usr/lib/aarch64-linux-gnu:/lib/aarch64-linux-gnu:\$ORIGIN" --set-interpreter /opt/glibc2.28/lib/ld-linux-aarch64.so.1 /opt/sublime_text/plugin_host-3.3 || \
-   ! patchelf --force-rpath --set-rpath "/opt/glibc2.28/lib:/usr/lib/aarch64-linux-gnu:/lib/aarch64-linux-gnu:\$ORIGIN" --set-interpreter /opt/glibc2.28/lib/ld-linux-aarch64.so.1 /opt/sublime_text/plugin_host-3.8 || \
-   ! patchelf --force-rpath --set-rpath "/opt/glibc2.28/lib:/usr/lib/aarch64-linux-gnu:/lib/aarch64-linux-gnu:\$ORIGIN" --set-interpreter /opt/glibc2.28/lib/ld-linux-aarch64.so.1 /opt/sublime_text/crash_reporter
+if ! patchelf --remove-rpath "${tempdir}/sublime_text" || \
+   ! patchelf --remove-rpath "${tempdir}/plugin_host-3.3" || \
+   ! patchelf --remove-rpath "${tempdir}/plugin_host-3.8" || \
+   ! patchelf --remove-rpath "${tempdir}/crash_reporter" || \
+   ! patchelf --force-rpath --set-rpath "/opt/glibc2.28/lib:/usr/lib/aarch64-linux-gnu:/lib/aarch64-linux-gnu:\$ORIGIN" --set-interpreter /opt/glibc2.28/lib/ld-linux-aarch64.so.1 "${tempdir}/sublime_text/sublime_text" || \
+   ! patchelf --force-rpath --set-rpath "/opt/glibc2.28/lib:/usr/lib/aarch64-linux-gnu:/lib/aarch64-linux-gnu:\$ORIGIN" --set-interpreter /opt/glibc2.28/lib/ld-linux-aarch64.so.1 "${tempdir}/sublime_text/plugin_host-3.3" || \
+   ! patchelf --force-rpath --set-rpath "/opt/glibc2.28/lib:/usr/lib/aarch64-linux-gnu:/lib/aarch64-linux-gnu:\$ORIGIN" --set-interpreter /opt/glibc2.28/lib/ld-linux-aarch64.so.1 "${tempdir}/sublime_text/plugin_host-3.8" || \
+   ! patchelf --force-rpath --set-rpath "/opt/glibc2.28/lib:/usr/lib/aarch64-linux-gnu:/lib/aarch64-linux-gnu:\$ORIGIN" --set-interpreter /opt/glibc2.28/lib/ld-linux-aarch64.so.1 "${tempdir}/sublime_text/crash_reporter"
 then
 	echo "Failed to patch Sublime Text binaries. Exiting."
+	rm -rf "${tempdir}"
 	exit 1
 fi
+
+if ! \cp -r "${tempdir}/"{sublime_text,plugin_host-3.3,plugin_host-3.8,crash_reporter} /opt/sublime_text
+then
+	echo "Failed to replace Sublime Text binaries. Exiting."
+	rm -rf "${tempdir}"
+	exit 1
+fi
+
+
+rm -rf "${tempdir}"
+
 
 echo "Successfully installed Sublime Text."
 exit 0
