@@ -1,5 +1,4 @@
-Sublime Text does not work out of the box on arm64 Ubuntu 18.04 Bionic machines since it required glibc2.28.  
-Trying to run Sublime Text anyway results in `plugin_host-3.3` and `plugin_host-3.8` crashing, which results in the vast majority of Sublime Text functions not working at all.
+Sublime Text does not work out of the box on arm64 Ubuntu 18.04 Bionic machines since it depends on glibc2.28.
 
 To make it work, just run `sudo bash -c "$(wget -qO - https://raw.githubusercontent.com/lulle2007200/sublime_on_arm64_bionic/master/install_sublime.sh)"`.  
 
