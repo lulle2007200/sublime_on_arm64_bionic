@@ -80,7 +80,7 @@ then
 	exit 1
 fi
 
-if ! cp /opt/sublime_text/{sublime_text,plugin_host-3.3,plugin_host-3.8,crash_reporter} "${tempdir}/"
+if ! cp /opt/sublime_text/{sublime_text,plugin_host-3.3,plugin_host-3.8,crash_handler} "${tempdir}/"
 then
 	echo "Failed to copy Sublime Text binaries to temporary directory. Exiting."
 	rm -rf "${tempdir}"
@@ -90,18 +90,18 @@ fi
 if ! patchelf --remove-rpath "${tempdir}/sublime_text" || \
    ! patchelf --remove-rpath "${tempdir}/plugin_host-3.3" || \
    ! patchelf --remove-rpath "${tempdir}/plugin_host-3.8" || \
-   ! patchelf --remove-rpath "${tempdir}/crash_reporter" || \
+   ! patchelf --remove-rpath "${tempdir}/crash_handler" || \
    ! patchelf --force-rpath --set-rpath "/opt/glibc2.28/lib:/usr/lib/aarch64-linux-gnu:/lib/aarch64-linux-gnu:\$ORIGIN" --set-interpreter /opt/glibc2.28/lib/ld-linux-aarch64.so.1 "${tempdir}/sublime_text" || \
    ! patchelf --force-rpath --set-rpath "/opt/glibc2.28/lib:/usr/lib/aarch64-linux-gnu:/lib/aarch64-linux-gnu:\$ORIGIN" --set-interpreter /opt/glibc2.28/lib/ld-linux-aarch64.so.1 "${tempdir}/plugin_host-3.3" || \
    ! patchelf --force-rpath --set-rpath "/opt/glibc2.28/lib:/usr/lib/aarch64-linux-gnu:/lib/aarch64-linux-gnu:\$ORIGIN" --set-interpreter /opt/glibc2.28/lib/ld-linux-aarch64.so.1 "${tempdir}/plugin_host-3.8" || \
-   ! patchelf --force-rpath --set-rpath "/opt/glibc2.28/lib:/usr/lib/aarch64-linux-gnu:/lib/aarch64-linux-gnu:\$ORIGIN" --set-interpreter /opt/glibc2.28/lib/ld-linux-aarch64.so.1 "${tempdir}/crash_reporter"
+   ! patchelf --force-rpath --set-rpath "/opt/glibc2.28/lib:/usr/lib/aarch64-linux-gnu:/lib/aarch64-linux-gnu:\$ORIGIN" --set-interpreter /opt/glibc2.28/lib/ld-linux-aarch64.so.1 "${tempdir}/crash_handler"
 then
 	echo "Failed to patch Sublime Text binaries. Exiting."
 	rm -rf "${tempdir}"
 	exit 1
 fi
 
-if ! \cp -f "${tempdir}/"{sublime_text,plugin_host-3.3,plugin_host-3.8,crash_reporter} /opt/sublime_text/
+if ! \cp -f "${tempdir}/"{sublime_text,plugin_host-3.3,plugin_host-3.8,crash_handler} /opt/sublime_text/
 then
 	echo "Failed to replace Sublime Text binaries. Exiting."
 	rm -rf "${tempdir}"
